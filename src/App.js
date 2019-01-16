@@ -1,11 +1,23 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
+import { Provider } from 'mobx-react'
+// Local imports
+import * as stores from './stores'
+import createRouter from './create-router5'
+import Layout from './components/Layout'
+
+const router = createRouter(true)
+
 const App = () => {
   return (
-    <div>
-      <p>React here! :-)</p>
-    </div>
+    <Provider {...stores}>
+      <Layout />
+    </Provider>
   )
 }
+
 export default App
-ReactDOM.render(<App />, document.getElementById('app'))
+
+router.start(() => {
+  ReactDOM.render(<App />, document.getElementById('app'))
+})
