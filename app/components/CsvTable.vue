@@ -102,13 +102,13 @@
 
 <script setup lang="ts">
 import {
-  createColumnHelper,
-  FlexRender,
-  getCoreRowModel,
-  getFilteredRowModel,
-  getPaginationRowModel,
-  getSortedRowModel,
-  useVueTable,
+    createColumnHelper,
+    FlexRender,
+    getCoreRowModel,
+    getFilteredRowModel,
+    getPaginationRowModel,
+    getSortedRowModel,
+    useVueTable,
 } from '@tanstack/vue-table'
 import { computed, ref } from 'vue'
 import { formatCellValue } from '~/lib/utils'

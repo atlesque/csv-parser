@@ -57,8 +57,8 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
-import { useCsvStore } from '~/stores/csv'
+import { ref } from 'vue';
+import { useCsvStore } from '~/stores/csv';
 
 const emit = defineEmits<{
   parsed: []

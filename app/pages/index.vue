@@ -22,8 +22,8 @@
 </template>
 
 <script setup lang="ts">
-import FileDropZone from '~/components/FileDropZone.vue'
-import { useCsvStore } from '~/stores/csv'
+import FileDropZone from '~/components/FileDropZone.vue';
+import { useCsvStore } from '~/stores/csv';
 
 const csvStore = useCsvStore()
 

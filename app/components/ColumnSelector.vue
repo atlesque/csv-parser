@@ -31,8 +31,8 @@
 </template>
 
 <script setup lang="ts">
-import type { Table } from '@tanstack/vue-table'
-import { ref } from 'vue'
+import type { Table } from '@tanstack/vue-table';
+import { ref } from 'vue';
 
 defineProps<{
   table?: Table<Record<string, unknown>>
