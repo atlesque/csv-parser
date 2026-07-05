@@ -13,7 +13,6 @@ export function parseCsvFile(file: File, callbacks: ParseCallbacks = {}): Promis
       header: true,
       dynamicTyping: true,
       skipEmptyLines: true,
-      worker: true,
 
       step: (results, _parser) => {
         allRows.push(results.data as CsvRow)
@@ -25,8 +24,8 @@ export function parseCsvFile(file: File, callbacks: ParseCallbacks = {}): Promis
         }
       },
 
-      complete: (results) => {
-        const columns = results.meta.fields ?? []
+      complete: (_results) => {
+        const columns = allRows.length > 0 ? Object.keys(allRows[0]) : []
         resolve({
           data: allRows,
           columns,
