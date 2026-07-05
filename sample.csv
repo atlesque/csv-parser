@@ -1,0 +1,27 @@
+Name,Age,Email,Country,Salary,Join Date,Active
+Alice Johnson,28,alice@example.com,USA,75000,2023-01-15,true
+Bob Smith,35,bob.smith@example.com,Canada,82000,2022-06-20,true
+Charlie Brown,22,charlie@example.com,UK,45000,2024-03-10,false
+Diana Prince,30,diana@example.com,USA,95000,2021-11-01,true
+Eve Davis,45,eve.davis@example.com,Australia,120000,2019-07-22,true
+Frank Miller,19,frank@example.com,Germany,28000,2025-02-01,false
+Grace Lee,33,grace.lee@example.com,South Korea,68000,2023-09-14,true
+Henry Wilson,40,henry@example.com,New Zealand,91000,2020-04-05,true
+Ivy Chen,27,,China,60000,2024-07-18,true
+Jack Taylor,50,jack.taylor@example.com,Canada,110000,2018-12-30,false
+Karen White,29,karen@example.com,Ireland,72000,2022-08-25,true
+Leo Martinez,31,leo@example.com,Mexico,55000,2023-05-12,true
+Maria Garcia,26,maria.garcia@example.com,Spain,48000,2024-11-03,true
+Noah Anderson,38,noah@example.com,USA,88000,2021-03-27,true
+Olivia Thomas,24,olivia@example.com,UK,52000,2024-06-09,false
+Paul Robinson,55,paul@example.com,USA,135000,2016-09-15,true
+Quinn Harris,0,quinn@example.com,Unknown,,2025-12-01,false
+Rachel Clark,32,rachel.clark@example.com,France,78000,2022-02-19,true
+Sam Lewis,41,sam.lewis@example.com,Australia,99000,2019-10-11,true
+Tina Walker,29,tina@example.com,USA,71000,2023-08-05,true
+Uma Patel,36,uma.patel@example.com,India,63000,2021-06-14,true
+Victor Young,47,victor@example.com,USA,"105,000",2017-04-22,false
+Wendy Hall,23,wendy@example.com,Canada,41000,2025-01-20,true
+Xander King,34,xander@example.com,USA,87000,2020-08-30,true
+Yara Foster,28,yara@example.com,Brazil,59000,2024-04-16,true
+Zane Brooks,42,zane.brooks@example.com,USA,96000,2018-06-07,true
