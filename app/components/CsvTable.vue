@@ -102,15 +102,16 @@
 
 <script setup lang="ts">
 import {
-    createColumnHelper,
-    FlexRender,
-    getCoreRowModel,
-    getFilteredRowModel,
-    getPaginationRowModel,
-    getSortedRowModel,
-    useVueTable,
+  createColumnHelper,
+  FlexRender,
+  getCoreRowModel,
+  getFilteredRowModel,
+  getPaginationRowModel,
+  getSortedRowModel,
+  useVueTable,
 } from '@tanstack/vue-table'
-import { computed, ref } from 'vue'
+import { computed, h, ref } from 'vue'
+import HighlightText from '~/components/HighlightText.vue'
 import { formatCellValue } from '~/lib/utils'
 import { useCsvStore } from '~/stores/csv'
 import type { CsvRow } from '~/types/csv'
@@ -125,7 +126,12 @@ const columnDefs = computed(() =>
   csvStore.columns.map((col) =>
     columnHelper.accessor(col, {
       header: () => col,
-      cell: (info) => formatCellValue(info.getValue()),
+      cell: (info) => {
+        const text = formatCellValue(info.getValue())
+        const query = globalFilter.value
+        if (!query) return text
+        return h(HighlightText, { text, query })
+      },
       enableSorting: true,
     }),
   ),
