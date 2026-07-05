@@ -1,27 +1,135 @@
-Name,Age,Email,Country,Salary,Join Date,Active
-Alice Johnson,28,alice@example.com,USA,75000,2023-01-15,true
-Bob Smith,35,bob.smith@example.com,Canada,82000,2022-06-20,true
-Charlie Brown,22,charlie@example.com,UK,45000,2024-03-10,false
-Diana Prince,30,diana@example.com,USA,95000,2021-11-01,true
-Eve Davis,45,eve.davis@example.com,Australia,120000,2019-07-22,true
-Frank Miller,19,frank@example.com,Germany,28000,2025-02-01,false
-Grace Lee,33,grace.lee@example.com,South Korea,68000,2023-09-14,true
-Henry Wilson,40,henry@example.com,New Zealand,91000,2020-04-05,true
-Ivy Chen,27,,China,60000,2024-07-18,true
-Jack Taylor,50,jack.taylor@example.com,Canada,110000,2018-12-30,false
-Karen White,29,karen@example.com,Ireland,72000,2022-08-25,true
-Leo Martinez,31,leo@example.com,Mexico,55000,2023-05-12,true
-Maria Garcia,26,maria.garcia@example.com,Spain,48000,2024-11-03,true
-Noah Anderson,38,noah@example.com,USA,88000,2021-03-27,true
-Olivia Thomas,24,olivia@example.com,UK,52000,2024-06-09,false
-Paul Robinson,55,paul@example.com,USA,135000,2016-09-15,true
-Quinn Harris,0,quinn@example.com,Unknown,,2025-12-01,false
-Rachel Clark,32,rachel.clark@example.com,France,78000,2022-02-19,true
-Sam Lewis,41,sam.lewis@example.com,Australia,99000,2019-10-11,true
-Tina Walker,29,tina@example.com,USA,71000,2023-08-05,true
-Uma Patel,36,uma.patel@example.com,India,63000,2021-06-14,true
-Victor Young,47,victor@example.com,USA,"105,000",2017-04-22,false
-Wendy Hall,23,wendy@example.com,Canada,41000,2025-01-20,true
-Xander King,34,xander@example.com,USA,87000,2020-08-30,true
-Yara Foster,28,yara@example.com,Brazil,59000,2024-04-16,true
-Zane Brooks,42,zane.brooks@example.com,USA,96000,2018-06-07,true
+Name,Age,Email,Country,Salary,Join Date,Active,Department,Role,Rating
+Alice Johnson,28,alice@example.com,USA,75000,2023-01-15,true,Engineering,Frontend Developer,4.5
+Bob Smith,35,bob.smith@example.com,Canada,82000,2022-06-20,true,Marketing,Marketing Manager,4.2
+Charlie Brown,22,charlie@example.com,UK,45000,2024-03-10,false,Engineering,Junior Developer,3.8
+Diana Prince,30,diana@example.com,USA,95000,2021-11-01,true,Design,UX Designer,4.7
+Eve Davis,45,eve.davis@example.com,Australia,120000,2019-07-22,true,Engineering,Senior Architect,4.9
+Frank Miller,19,frank@example.com,Germany,28000,2025-02-01,false,Sales,Intern,3.2
+Grace Lee,33,grace.lee@example.com,South Korea,68000,2023-09-14,true,Finance,Accountant,4.0
+Henry Wilson,40,henry@example.com,New Zealand,91000,2020-04-05,true,Engineering,DevOps Engineer,4.3
+Ivy Chen,27,,China,60000,2024-07-18,true,Design,Graphic Designer,4.1
+Jack Taylor,50,jack.taylor@example.com,Canada,110000,2018-12-30,false,Engineering,CTO,4.8
+Karen White,29,karen@example.com,Ireland,72000,2022-08-25,true,HR,HR Specialist,3.9
+Leo Martinez,31,leo@example.com,Mexico,55000,2023-05-12,true,Sales,Sales Representative,3.7
+Maria Garcia,26,maria.garcia@example.com,Spain,48000,2024-11-03,true,Engineering,Backend Developer,4.4
+Noah Anderson,38,noah@example.com,USA,88000,2021-03-27,true,Operations,Operations Lead,4.6
+Olivia Thomas,24,olivia@example.com,UK,52000,2024-06-09,false,Marketing,Content Writer,3.5
+Paul Robinson,55,paul@example.com,USA,"135,000",2016-09-15,true,Executive,CEO,4.9
+Quinn Harris,,quinn@example.com,Unknown,,2025-12-01,false,Engineering,Contractor,3.0
+Rachel Clark,32,rachel.clark@example.com,France,78000,2022-02-19,true,Legal,Legal Counsel,4.3
+Sam Lewis,41,sam.lewis@example.com,Australia,99000,2019-10-11,true,Engineering,Tech Lead,4.6
+Tina Walker,29,tina@example.com,USA,71000,2023-08-05,true,Customer Support,Support Lead,4.0
+Uma Patel,36,uma.patel@example.com,India,63000,2021-06-14,true,Engineering,QA Engineer,4.2
+Victor Young,47,victor@example.com,USA,"105,000",2017-04-22,false,Engineering,Systems Architect,4.5
+Wendy Hall,23,wendy@example.com,Canada,41000,2025-01-20,true,Design,Junior Designer,3.6
+Xander King,34,xander@example.com,USA,87000,2020-08-30,true,Engineering,Full Stack Developer,4.4
+Yara Foster,28,yara@example.com,Brazil,59000,2024-04-16,true,Marketing,SEO Specialist,4.1
+Zane Brooks,42,zane.brooks@example.com,USA,96000,2018-06-07,true,Engineering,Data Engineer,4.5
+Amara Okafor,29,amara@example.com,Nigeria,65000,2023-02-14,true,Finance,Financial Analyst,4.0
+Bjorn Larsson,44,bjorn.larsson@example.com,Sweden,94000,2019-08-19,true,Engineering,Platform Engineer,4.7
+Clara Dubois,31,clara.dubois@example.com,France,72000,2022-11-22,true,Design,Product Designer,4.3
+Dmitri Volkov,39,dmitri@example.com,Russia,85000,2021-05-30,false,Engineering,Security Engineer,4.1
+Elena Rossi,26,elena@example.com,Italy,47000,2024-09-01,true,Sales,Sales Associate,3.8
+Felix Andersen,52,felix@example.com,Denmark,125000,2017-03-15,true,Executive,CFO,4.8
+Gabriela Santos,33,gabriela@example.com,Brazil,61000,2023-07-08,true,Marketing,Social Media Manager,4.0
+Hiroshi Tanaka,46,hiroshi.t@example.com,Japan,105000,2019-01-25,true,Engineering,Engineering Manager,4.6
+Isabella Fernández,27,isabella@example.com,Argentina,44000,2025-04-10,true,Design,Illustrator,3.9
+Jamal Washington,38,jamal.w@example.com,USA,83000,2021-09-12,true,Operations,Project Manager,4.4
+Keiko Yamamoto,30,keiko@example.com,Japan,69000,2023-11-05,true,Finance,Tax Specialist,4.2
+Lars Nielsen,49,lars@example.com,Netherlands,115000,2018-04-18,true,Engineering,Principal Engineer,4.8
+Mei Lin,24,mei.lin@example.com,Singapore,51000,2024-12-20,true,Marketing,Growth Hacker,4.1
+Nadia Belkacem,35,nadia@example.com,Algeria,67000,2022-03-28,true,HR,Recruiter,4.0
+Oscar Gutierrez,41,oscar.g@example.com,Colombia,88000,2020-07-14,false,Engineering,Mobile Developer,4.3
+Priya Sharma,28,priya@example.com,India,54000,2024-01-08,true,Engineering,Frontend Developer,4.2
+Quentin Dupont,33,,Belgium,73000,2022-10-15,true,Sales,Account Executive,3.9
+Rosa Jiménez,45,rosa@example.com,Spain,92000,2019-05-03,true,Legal,Compliance Officer,4.5
+Stefan Mueller,37,stefan@example.com,Germany,86000,2021-02-19,true,Engineering,Backend Developer,4.4
+Tessa van Dijk,26,tessa@example.com,Netherlands,49000,2024-08-22,true,Design,UI Designer,4.0
+Uche Nnamdi,54,uche@example.com,Nigeria,130000,2016-11-07,true,Executive,COO,4.7
+Valentina Petrova,31,valentina@example.com,Russia,62000,2023-04-25,true,Marketing,Brand Strategist,4.1
+Wei Zhang,43,wei@example.com,China,97000,2019-06-30,true,Engineering,AI Engineer,4.6
+Xiomara Torres,25,xiomara@example.com,Peru,44000,2025-03-18,false,Customer Support,Support Agent,3.6
+Yuki Sato,34,yuki@example.com,Japan,76000,2022-01-12,true,Finance,Risk Analyst,4.2
+Zara Khan,29,zara.khan@example.com,Pakistan,58000,2023-06-09,true,Engineering,DevOps Engineer,4.3
+Anders Johansson,48,anders@example.com,Sweden,108000,2018-09-21,true,Engineering,Cloud Architect,4.7
+Beatriz Oliveira,27,beatriz@example.com,Portugal,50000,2024-05-14,true,Design,Motion Designer,4.0
+Cheng Wei,39,cheng.w@example.com,China,89000,2021-01-03,true,Engineering,Database Admin,4.4
+Dalia Hassan,32,dalia@example.com,Egypt,64000,2023-08-27,true,Marketing,Content Strategist,4.1
+Erik Svensson,55,erik@example.com,Sweden,"140,000",2015-06-10,true,Executive,Chairman,5.0
+Fatima Zahra,26,fatima@example.com,Morocco,43000,2025-02-14,true,Finance,Bookkeeper,3.8
+George Papadopoulos,44,george.p@example.com,Greece,93000,2019-10-08,true,Engineering,Solution Architect,4.5
+Hannah Müller,23,hannah@example.com,Austria,38000,2025-06-01,false,Sales,Junior Sales Rep,3.4
+Ibrahim Diallo,36,ibrahim@example.com,Senegal,71000,2022-04-17,true,Operations,Logistics Manager,4.2
+Julia Kowalski,30,julia.k@example.com,Poland,66000,2023-01-29,true,Engineering,Full Stack Developer,4.3
+Kevin O'Brien,47,kevin.o@example.com,Ireland,102000,2018-02-14,true,Finance,Finance Director,4.6
+Lena Fischer,28,lena@example.com,Switzerland,81000,2023-12-03,true,Legal,IP Attorney,4.4
+Mohammed Al-Rashid,41,mohammed@example.com,UAE,95000,2020-05-20,true,Engineering,Data Scientist,4.5
+Natalia Costa,25,natalia@example.com,Portugal,45000,2024-10-11,true,Design,UX Researcher,3.9
+Oliver Brown,34,oliver.b@example.com,UK,77000,2022-07-06,true,Marketing,Digital Marketing Lead,4.2
+Patricia Santos,51,patricia@example.com,Brazil,118000,2017-08-19,false,HR,HR Director,4.5
+Ravi Krishnan,33,ravi@example.com,India,69000,2023-03-14,true,Engineering,ML Engineer,4.4
+Sofia Andersson,29,sofia@example.com,Sweden,60000,2024-02-28,true,Design,Brand Designer,4.1
+Thomas Dubois,45,thomas.d@example.com,France,98000,2019-04-22,true,Engineering,Staff Engineer,4.7
+Ursula Meier,38,ursula@example.com,Germany,84000,2021-08-15,true,Finance,Controller,4.3
+Viktor Horvat,27,viktor@example.com,Croatia,46000,2024-07-19,true,Sales,Business Developer,3.8
+Wanda Nowak,42,wanda@example.com,Poland,90000,2020-11-30,true,Operations,Supply Chain Manager,4.4
+Ximena Flores,24,ximena@example.com,Mexico,39000,2025-05-25,false,Customer Support,Support Agent,3.5
+Yusuf Demir,35,yusuf@example.com,Turkey,74000,2022-12-09,true,Engineering,Site Reliability Eng,4.3
+Zoe Papadakis,31,zoe@example.com,Greece,57000,2023-10-02,true,Marketing,PR Specialist,4.0
+Akira Nakamura,50,akira@example.com,Japan,125000,2017-01-15,true,Executive,CTO,4.8
+Brigitte Lefèvre,43,brigitte@example.com,Belgium,91000,2019-09-28,true,Legal,Data Privacy Officer,4.5
+Carlos Mendoza,33,carlos.m@example.com,Chile,65000,2023-05-07,true,Engineering,Android Developer,4.2
+Danuta Wiśniewska,28,danuta@example.com,Poland,53000,2024-11-16,true,Finance,Auditor,4.0
+Emeka Okafor,46,emeka@example.com,Nigeria,103000,2018-07-24,true,Engineering,Engineering Director,4.7
+Freja Nielsen,25,freja@example.com,Denmark,47000,2025-01-09,false,Design,Product Designer,3.9
+Giorgio Moretti,38,giorgio@example.com,Italy,85000,2021-04-13,true,Engineering,iOS Developer,4.3
+Helena Bergström,41,helena@example.com,Sweden,96000,2020-02-05,true,Marketing,VP Marketing,4.6
+Iñaki Zubizarreta,27,inaki@example.com,Spain,51000,2024-08-30,true,Sales,Solution Engineer,4.0
+Jasmine Wong,32,jasmine.w@example.com,Malaysia,61000,2023-02-19,true,Engineering,QA Lead,4.2
+Klaus Schneider,53,klaus@example.com,Germany,"127,000",2016-05-11,true,Executive,Managing Director,4.9
+Linnea Axelsson,26,linnea@example.com,Finland,49000,2024-06-24,true,Design,Interaction Designer,4.1
+Marek Nowicki,39,marek@example.com,Poland,87000,2021-10-17,true,Engineering,Blockchain Developer,4.4
+Noura Benali,30,noura@example.com,Tunisia,56000,2023-07-31,true,Marketing,Affiliate Manager,3.9
+Oleksandr Shevchenko,44,oleksandr@example.com,Ukraine,89000,2019-12-14,true,Engineering,Cyber Security Eng,4.5
+Petra Horáková,25,petra@example.com,Czech Republic,42000,2025-04-01,false,HR,HR Assistant,3.7
+Qasim Abbas,34,qasim@example.com,Pakistan,60000,2022-09-08,true,Finance,Budget Analyst,4.1
+Renate Bauer,48,renate@example.com,Austria,105000,2018-03-26,true,Operations,Facilities Director,4.5
+Sergei Ivanov,36,sergei@example.com,Russia,78000,2021-07-09,true,Engineering,System Administrator,4.2
+Tereza Svobodová,29,tereza@example.com,Czech Republic,54000,2023-11-22,true,Design,Copywriter,4.0
+Umar Farooq,42,umar@example.com,Pakistan,92000,2020-06-15,true,Engineering,Network Engineer,4.4
+Vera Schmid,31,vera@example.com,Switzerland,71000,2022-10-28,true,Legal,Contract Manager,4.2
+Winston Chu,55,winston@example.com,Singapore,138000,2015-08-07,true,Executive,Founder,4.9
+Xenia Petridou,24,xenia@example.com,Greece,38000,2025-07-01,false,Sales,SDR,3.5
+Yannick Bernard,37,yannick@example.com,France,82000,2021-12-05,true,Engineering,Cloud Engineer,4.4
+Zofia Kowalczyk,28,zofia@example.com,Poland,57000,2024-03-17,true,Marketing,Email Marketing Spec,4.0
+Aaron Blackwell,45,aaron.b@example.com,USA,101000,2018-11-09,true,Engineering,Dev Manager,4.5
+Bình Nguyễn,30,binh@example.com,Vietnam,55000,2023-08-13,true,Engineering,React Developer,4.2
+Camille Roux,26,camille@example.com,France,48000,2024-09-26,true,Design,Art Director,4.1
+Daisuke Ito,41,daisuke@example.com,Japan,88000,2020-03-21,true,Finance,Investment Analyst,4.3
+Elin Persson,33,elin@example.com,Sweden,67000,2022-05-18,true,Customer Support,CX Manager,4.2
+Felipe Rojas,38,felipe@example.com,Chile,74000,2021-11-25,false,Engineering,Game Developer,4.1
+Greta Neumann,27,greta@example.com,Germany,50000,2024-12-07,true,Sales,Inside Sales Rep,3.8
+Hassan El-Sayed,43,hassan@example.com,Egypt,91000,2019-08-14,true,Engineering,SRE Lead,4.6
+Ingrid Larsen,29,ingrid@example.com,Norway,63000,2023-04-02,true,Design,Service Designer,4.2
+Jean-Pierre Martin,54,jeanpierre@example.com,France,122000,2017-02-10,true,Executive,VP Engineering,4.8
+Katarina Horvat,25,katarina@example.com,Croatia,41000,2025-05-08,false,Marketing,Social Media Coord,3.6
+Luca Bianchi,40,luca@example.com,Italy,86000,2020-09-03,true,Engineering,Embedded Systems Eng,4.4
+Mina Park,32,mina.park@example.com,South Korea,70000,2022-08-12,true,Finance,Financial Planner,4.1
+Ngọc Trần,26,ngoc@example.com,Vietnam,44000,2024-10-19,true,Design,Visual Designer,3.9
+Óscar Hernández,49,oscar.h@example.com,Mexico,107000,2018-05-16,true,Operations,VP Operations,4.7
+Pia Lindström,28,pia@example.com,Finland,58000,2023-12-24,true,Marketing,Analytics Manager,4.2
+Rafael da Silva,37,rafael@example.com,Brazil,79000,2021-02-08,true,Engineering,Test Engineer,4.3
+Sakura Yoshida,31,sakura@example.com,Japan,65000,2023-06-27,true,HR,Learning & Dev Spec,4.0
+Tobias Berg,44,tobias@example.com,Sweden,99000,2019-11-13,true,Engineering,Distributed Systems Eng,4.6
+Ulrich Klein,52,ulrich@example.com,Switzerland,"115,000",2017-09-05,false,Finance,Treasury Manager,4.4
+Valeria Rossi,25,valeria@example.com,Italy,40000,2025-03-22,true,Sales,Lead Generation Spec,3.7
+Wojciech Lewandowski,39,wojciech@example.com,Poland,83000,2021-06-18,true,Engineering,Kubernetes Engineer,4.5
+Yasmine Alaoui,27,yasmine@example.com,Morocco,52000,2024-04-29,true,Design,Creative Director,4.2
+Zoltán Nagy,46,zoltan@example.com,Hungary,95000,2018-10-06,true,Engineering,Research Engineer,4.5
+Anja Rasmussen,30,anja@example.com,Norway,61000,2023-01-19,true,Finance,Business Analyst,4.1
+Bas van der Meer,35,bas@example.com,Netherlands,77000,2022-07-04,true,Marketing,Growth Manager,4.3
+Catherine Bell,42,catherine@example.com,UK,93000,2020-04-11,true,Legal,General Counsel,4.6
+Dorian Popescu,28,dorian@example.com,Romania,46000,2024-11-07,true,Engineering,Python Developer,4.0
+Ester Cohen,33,ester@example.com,Israel,73000,2022-03-15,true,Engineering,DevSecOps Engineer,4.3
+Fumiko Abe,45,fumiko@example.com,Japan,100000,2019-05-29,true,Operations,Program Manager,4.5
+Gabriel Costa,26,gabriel.c@example.com,Brazil,43000,2025-02-28,false,Design,3D Artist,3.8
