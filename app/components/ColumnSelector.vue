@@ -11,7 +11,7 @@
 
     <div
       v-if="open"
-      class="absolute right-0 top-full z-50 mt-1 w-56 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 p-2 shadow-lg"
+      class="absolute left-0 top-full z-50 mt-1 w-56 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 p-2 shadow-lg"
     >
       <label
         v-for="column in table.getAllLeafColumns()"
