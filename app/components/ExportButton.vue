@@ -13,17 +13,14 @@
 </template>
 
 <script setup lang="ts">
-import type { Table } from '@tanstack/vue-table'
-import { computed } from 'vue'
-import { downloadCsv } from '~/lib/utils'
-import { useCsvStore } from '~/stores/csv'
-import type { CsvRow } from '~/types/csv'
+import type { Table } from '@tanstack/vue-table';
+import { computed } from 'vue';
+import { downloadCsv } from '~/lib/utils';
+import type { CsvRow } from '~/types/csv';
 
 const props = defineProps<{
   table?: Table<Record<string, unknown>>
 }>()
-
-const csvStore = useCsvStore()
 
 const hasRows = computed(() => {
   if (!props.table) return false
@@ -33,6 +30,7 @@ const hasRows = computed(() => {
 function exportData() {
   if (!props.table) return
   const rows = props.table.getFilteredRowModel().rows.map((row) => row.original as CsvRow)
-  downloadCsv(rows, csvStore.columns, 'export.csv')
+  const visibleColumns = props.table.getVisibleLeafColumns().map((col) => col.id)
+  downloadCsv(rows, visibleColumns, 'export.csv')
 }
 </script>
