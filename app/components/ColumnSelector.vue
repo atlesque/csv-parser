@@ -24,7 +24,7 @@
           class="rounded border-gray-300 text-gray-900 focus:ring-gray-900"
           @change="column.toggleVisibility()"
         />
-        {{ column.columnDef.header as string }}
+        {{ column.id }}
       </label>
     </div>
   </div>
