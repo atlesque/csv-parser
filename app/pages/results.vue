@@ -12,10 +12,18 @@
 
     <div v-else class="space-y-4">
       <div class="flex flex-wrap items-center justify-between gap-3">
-        <p class="text-sm text-gray-500 dark:text-gray-400">
-          {{ csvStore.rowCount.toLocaleString() }} rows &middot;
-          {{ csvStore.columnCount }} columns
-        </p>
+        <div class="flex items-center gap-3">
+          <button
+            class="inline-flex items-center gap-1.5 rounded-lg border border-gray-300 dark:border-gray-600 px-3 py-1.5 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors cursor-pointer"
+            @click="startOver"
+          >
+            &larr; Start over
+          </button>
+          <p class="text-sm text-gray-500 dark:text-gray-400">
+            {{ csvStore.rowCount.toLocaleString() }} rows &middot;
+            {{ csvStore.columnCount }} columns
+          </p>
+        </div>
         <div class="flex items-center gap-2">
           <ColumnSelector :table="table" />
           <ExportButton :table="table" />
@@ -42,4 +50,9 @@ definePageMeta({
 const csvStore = useCsvStore()
 const tableRef = ref<InstanceType<typeof CsvTable> | null>(null)
 const table = computed(() => tableRef.value?.table as Table<Record<string, unknown>> | undefined)
+
+async function startOver() {
+  csvStore.clearData()
+  await navigateTo('/')
+}
 </script>
