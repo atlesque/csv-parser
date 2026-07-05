@@ -6,7 +6,7 @@
         v-model="globalFilter"
         type="text"
         placeholder="Search all columns..."
-        class="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 px-3 py-2 text-sm placeholder:text-gray-400 dark:placeholder:text-gray-500 focus:border-gray-900 dark:focus:border-gray-100 focus:outline-none"
+        class="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 px-3 py-2 text-sm text-gray-900 dark:text-gray-100 placeholder:text-gray-400 dark:placeholder:text-gray-500 focus:border-gray-900 dark:focus:border-gray-100 focus:outline-none"
       />
     </div>
 
@@ -69,10 +69,10 @@
       <div class="flex items-center gap-2">
         <select
           :value="table.getState().pagination.pageSize"
-          class="rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 px-2 py-1.5 text-sm focus:border-gray-900 dark:focus:border-gray-100 focus:outline-none"
+          class="rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 px-2 py-1.5 text-sm text-gray-900 dark:text-gray-100 focus:border-gray-900 dark:focus:border-gray-100 focus:outline-none"
           @change="(e) => table.setPageSize(Number((e.target as HTMLSelectElement).value))"
         >
-          <option v-for="size in pageSizes" :key="size" :value="size">{{ size }}</option>
+          <option v-for="size in pageSizes" :key="size" :value="size" class="text-gray-900 dark:text-gray-100 bg-white dark:bg-gray-900">{{ size }}</option>
         </select>
         <span class="text-sm text-gray-400 dark:text-gray-500">per page</span>
       </div>
