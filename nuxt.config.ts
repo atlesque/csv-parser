@@ -16,6 +16,12 @@ export default defineNuxtConfig({
       link: [
         { rel: 'icon', type: 'image/svg+xml', href: '/favicon.svg' },
       ],
+      script: [
+        {
+          innerHTML: `(function(){try{var m=localStorage.getItem('csv-parser-color-mode')||'auto';var d=m==='dark'||(m==='auto'&&window.matchMedia('(prefers-color-scheme:dark)').matches);if(d)document.documentElement.classList.add('dark');window.__CSV_COLOR_MODE__=m}catch(e){}})()`,
+          type: 'text/javascript',
+        },
+      ],
     },
   },
 

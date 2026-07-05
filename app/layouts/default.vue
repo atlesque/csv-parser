@@ -1,14 +1,18 @@
 <template>
-  <div class="min-h-screen bg-gray-50">
-    <header class="sticky top-0 z-50 border-b bg-white/80 backdrop-blur">
+  <div class="min-h-screen bg-gray-50 dark:bg-gray-950 transition-colors">
+    <header class="sticky top-0 z-50 border-b border-gray-200 dark:border-gray-800 bg-white/80 dark:bg-gray-900/80 backdrop-blur">
       <div class="mx-auto flex h-14 max-w-5xl items-center justify-between px-4">
-        <NuxtLink to="/" class="text-lg font-semibold tracking-tight text-gray-900">
+        <NuxtLink to="/" class="text-lg font-semibold tracking-tight text-gray-900 dark:text-gray-100">
           CSV Parser
         </NuxtLink>
-        <div v-if="isResultsPage" class="flex items-center gap-2">
+        <div class="flex items-center gap-2">
+          <ClientOnly>
+            <DarkModeToggle />
+          </ClientOnly>
           <button
+            v-if="isResultsPage"
             type="button"
-            class="inline-flex items-center gap-1.5 rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors"
+            class="inline-flex items-center gap-1.5 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
             @click="startOver"
           >
             <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">

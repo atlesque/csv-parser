@@ -1,7 +1,7 @@
 <template>
   <div v-if="table" class="relative">
     <button
-      class="inline-flex items-center gap-1.5 rounded-lg border border-gray-300 px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
+      class="inline-flex items-center gap-1.5 rounded-lg border border-gray-300 dark:border-gray-600 px-3 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
       @click="open = !open"
       @blur="onCloseDelay"
     >
@@ -11,17 +11,17 @@
 
     <div
       v-if="open"
-      class="absolute right-0 top-full z-50 mt-1 w-56 rounded-xl border border-gray-200 bg-white p-2 shadow-lg"
+      class="absolute right-0 top-full z-50 mt-1 w-56 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 p-2 shadow-lg"
     >
       <label
         v-for="column in table.getAllLeafColumns()"
         :key="column.id"
-        class="flex cursor-pointer items-center gap-2 rounded-lg px-2 py-1.5 text-sm hover:bg-gray-50"
+        class="flex cursor-pointer items-center gap-2 rounded-lg px-2 py-1.5 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800"
       >
         <input
           type="checkbox"
           :checked="column.getIsVisible()"
-          class="rounded border-gray-300 text-gray-900 focus:ring-gray-900"
+          class="rounded border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 focus:ring-gray-900 dark:focus:ring-gray-100"
           @change="column.toggleVisibility()"
         />
         {{ column.id }}

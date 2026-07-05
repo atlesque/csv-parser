@@ -1,10 +1,10 @@
 <template>
   <div>
     <div v-if="!csvStore.hasData" class="flex flex-col items-center gap-4 py-20">
-      <p class="text-gray-500">No data to display.</p>
+      <p class="text-gray-500 dark:text-gray-400">No data to display.</p>
       <NuxtLink
         to="/"
-        class="inline-flex items-center gap-2 rounded-lg bg-gray-900 px-4 py-2.5 text-sm font-medium text-white hover:bg-gray-800 transition-colors"
+        class="inline-flex items-center gap-2 rounded-lg bg-gray-900 dark:bg-gray-100 dark:text-gray-900 px-4 py-2.5 text-sm font-medium text-white hover:bg-gray-800 dark:hover:bg-gray-200 transition-colors"
       >
         &larr; Upload a CSV file
       </NuxtLink>
@@ -12,7 +12,7 @@
 
     <div v-else class="space-y-4">
       <div class="flex flex-wrap items-center justify-between gap-3">
-        <p class="text-sm text-gray-500">
+        <p class="text-sm text-gray-500 dark:text-gray-400">
           {{ csvStore.rowCount.toLocaleString() }} rows &middot;
           {{ csvStore.columnCount }} columns
         </p>

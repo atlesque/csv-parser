@@ -1,6 +1,6 @@
 <template>
   <button
-    class="inline-flex items-center gap-1.5 rounded-lg bg-gray-900 px-3 py-2 text-sm font-medium text-white hover:bg-gray-800 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+    class="inline-flex items-center gap-1.5 rounded-lg bg-gray-900 dark:bg-gray-100 dark:text-gray-900 px-3 py-2 text-sm font-medium text-white hover:bg-gray-800 dark:hover:bg-gray-200 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
     :disabled="!hasRows"
     @click="exportData"
   >

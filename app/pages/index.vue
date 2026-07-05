@@ -1,7 +1,7 @@
 <template>
   <div class="flex flex-col items-center justify-center gap-6 py-12">
-    <h1 class="text-2xl font-bold text-gray-900">CSV Parser</h1>
-    <p class="text-gray-500">Upload a CSV file to view, sort, filter, and export your data.</p>
+    <h1 class="text-2xl font-bold text-gray-900 dark:text-gray-100">CSV Parser</h1>
+    <p class="text-gray-500 dark:text-gray-400">Upload a CSV file to view, sort, filter, and export your data.</p>
 
     <FileDropZone @parsed="onParsed" />
   </div>
