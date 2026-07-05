@@ -29,10 +29,10 @@ export const useCsvStore = defineStore('csv', () => {
 
     try {
       const result = await parseCsvFile(file.value, {
-        onProgress: () => {
-          // Progress is tracked per row; set to intermediate value
-          if (loadingProgress.value < 90) {
-            loadingProgress.value = Math.min(loadingProgress.value + 5, 90)
+        onProgress: ({ loaded, total }: { loaded: number; total: number }) => {
+          if (total > 0) {
+            // Compute real progress based on actual rows parsed vs estimated total
+            loadingProgress.value = Math.min(Math.round((loaded / total) * 100), 99)
           }
         },
       })

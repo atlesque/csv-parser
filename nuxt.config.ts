@@ -11,6 +11,14 @@ export default defineNuxtConfig({
 
   ssr: true,
 
+  app: {
+    head: {
+      link: [
+        { rel: 'icon', type: 'image/svg+xml', href: '/favicon.svg' },
+      ],
+    },
+  },
+
   modules: ['@pinia/nuxt'],
 
   css: ['~/assets/css/main.css'],

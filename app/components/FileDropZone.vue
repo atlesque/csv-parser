@@ -41,8 +41,8 @@
       <div v-if="csvStore.loadingProgress > 0 && csvStore.loadingProgress < 100" class="mt-4 space-y-2">
         <div class="h-2 w-full overflow-hidden rounded-full bg-gray-200">
           <div
-            class="h-full rounded-full bg-gray-900 transition-all duration-300"
-            :style="{ width: `${csvStore.loadingProgress}%` }"
+            class="h-full rounded-full bg-gray-900"
+            :style="{ width: csvStore.loadingProgress + '%' }"
           />
         </div>
         <p class="text-center text-xs text-gray-400">Parsing&hellip; {{ csvStore.loadingProgress }}%</p>
@@ -57,7 +57,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
+import { computed, ref } from 'vue';
 import { useCsvStore } from '~/stores/csv';
 
 const emit = defineEmits<{

@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" role="img" aria-labelledby="title desc">
+  <title id="title">CSV Parser Favicon</title>
+  <desc id="desc">A dark rounded-square favicon with a CSV document, table grid, and code badge.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#151b24"/>
+      <stop offset="1" stop-color="#080d14"/>
+    </linearGradient>
+    <linearGradient id="green" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#35b86f"/>
+      <stop offset="1" stop-color="#16884b"/>
+    </linearGradient>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="18" stdDeviation="22" flood-color="#000" flood-opacity="0.28"/>
+    </filter>
+  </defs>
+
+  <rect width="1024" height="1024" rx="128" fill="url(#bg)"/>
+
+  <g filter="url(#shadow)">
+    <path d="M250 150h400l170 170v500a70 70 0 0 1-70 70H250a70 70 0 0 1-70-70V220a70 70 0 0 1 70-70Z" fill="#fbfbfc"/>
+    <path d="M650 150v120a50 50 0 0 0 50 50h120L650 150Z" fill="url(#green)"/>
+    <path d="M650 150v120a50 50 0 0 0 50 50h120" fill="none" stroke="#117a42" stroke-width="2" opacity="0.35"/>
+  </g>
+
+  <text x="500" y="430" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="150" font-weight="800" letter-spacing="8" fill="#1f9a58">CSV</text>
+
+  <g transform="translate(248 500)">
+    <rect x="0" y="0" width="530" height="310" rx="28" fill="none" stroke="#d9dde1" stroke-width="20"/>
+    <rect x="10" y="10" width="510" height="66" rx="16" fill="url(#green)"/>
+    <path d="M0 86h530M0 160h530M0 234h530M150 0v310M300 0v310M450 0v310" stroke="#d9dde1" stroke-width="16"/>
+  </g>
+
+  <g transform="translate(625 600)">
+    <circle cx="135" cy="135" r="135" fill="#101722" stroke="#050912" stroke-width="16"/>
+    <circle cx="135" cy="135" r="108" fill="none" stroke="#2eaf68" stroke-width="16"/>
+    <path d="M92 105 55 135l37 30M178 105l37 30-37 30" fill="none" stroke="#fff" stroke-width="22" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M147 82 123 188" fill="none" stroke="#fff" stroke-width="22" stroke-linecap="round"/>
+  </g>
+</svg>
