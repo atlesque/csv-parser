@@ -1,9 +1,8 @@
 <template>
-  <div v-if="table" class="relative">
+  <div v-if="table" class="relative" @click.stop>
     <button
       class="inline-flex items-center gap-1.5 rounded-lg border border-gray-300 dark:border-gray-600 px-3 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
-      @click="open = !open"
-      @blur="onCloseDelay"
+      @click="toggle"
     >
       Columns
       <span aria-hidden="true" class="text-gray-400">&dtrif;</span>
@@ -32,7 +31,7 @@
 
 <script setup lang="ts">
 import type { Table } from '@tanstack/vue-table';
-import { ref } from 'vue';
+import { onMounted, onUnmounted, ref } from 'vue';
 
 defineProps<{
   table?: Table<Record<string, unknown>>
@@ -40,9 +39,14 @@ defineProps<{
 
 const open = ref(false)
 
-function onCloseDelay() {
-  setTimeout(() => {
-    open.value = false
-  }, 150)
+function toggle() {
+  open.value = !open.value
 }
+
+function onWindowClick() {
+  open.value = false
+}
+
+onMounted(() => window.addEventListener('click', onWindowClick))
+onUnmounted(() => window.removeEventListener('click', onWindowClick))
 </script>
