@@ -15,14 +15,33 @@
       <label
         v-for="column in table.getAllLeafColumns()"
         :key="column.id"
-        class="flex cursor-pointer items-center gap-2 rounded-lg px-2 py-1.5 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800"
+        class="group flex cursor-pointer items-center gap-2.5 rounded-lg px-2 py-1.5 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 select-none"
       >
-        <input
-          type="checkbox"
-          :checked="column.getIsVisible()"
-          class="rounded border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 focus:ring-gray-900 dark:focus:ring-gray-100"
-          @change="column.toggleVisibility()"
-        />
+        <span class="relative flex size-4 shrink-0 items-center justify-center">
+          <input
+            type="checkbox"
+            :checked="column.getIsVisible()"
+            class="peer sr-only"
+            @change="column.toggleVisibility()"
+          />
+          <span
+            class="absolute inset-0 rounded border border-gray-300 dark:border-gray-500 bg-white dark:bg-gray-800 transition-all duration-150
+                   peer-checked:border-gray-900 peer-checked:bg-gray-900 dark:peer-checked:border-gray-100 dark:peer-checked:bg-gray-100
+                   peer-focus-visible:ring-2 peer-focus-visible:ring-gray-900/30 dark:peer-focus-visible:ring-gray-100/30 peer-focus-visible:ring-offset-1
+                   group-hover:border-gray-400 dark:group-hover:border-gray-400"
+          />
+          <svg
+            class="pointer-events-none relative size-3 text-white dark:text-gray-900 opacity-0 transition-opacity duration-150 peer-checked:opacity-100"
+            viewBox="0 0 16 16"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2.5"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <path d="M3 8l3.5 3.5L13 5" />
+          </svg>
+        </span>
         {{ column.id }}
       </label>
     </div>
