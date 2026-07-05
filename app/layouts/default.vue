@@ -1,7 +1,7 @@
 <template>
   <div class="min-h-screen bg-gray-50 dark:bg-gray-950 transition-colors">
     <header class="sticky top-0 z-50 border-b border-gray-200 dark:border-gray-800 bg-white/80 dark:bg-gray-900/80 backdrop-blur">
-      <div class="mx-auto flex h-14 max-w-5xl items-center justify-between px-4">
+      <div class="flex h-14 items-center justify-between px-4">
         <NuxtLink to="/" class="text-lg font-semibold tracking-tight text-gray-900 dark:text-gray-100">
           CSV Parser
         </NuxtLink>
