@@ -111,7 +111,7 @@ import {
   useVueTable,
 } from '@tanstack/vue-table'
 import { computed, h, ref } from 'vue'
-import HighlightText from '~/components/HighlightText.vue'
+import CellContent from '~/components/CellContent.vue'
 import { formatCellValue } from '~/lib/utils'
 import { useCsvStore } from '~/stores/csv'
 import type { CsvRow } from '~/types/csv'
@@ -128,9 +128,7 @@ const columnDefs = computed(() =>
       header: () => col,
       cell: (info) => {
         const text = formatCellValue(info.getValue())
-        const query = globalFilter.value
-        if (!query) return text
-        return h(HighlightText, { text, query })
+        return h(CellContent, { text, query: globalFilter.value })
       },
       enableSorting: true,
     }),
