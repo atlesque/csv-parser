@@ -32,13 +32,13 @@ function splitCsvRows(text: string): string[] {
 
     if (ch === '"') {
       if (inQuotes && next === '"') {
-        // Escaped quote inside quotes
-        current += '""'
-        i++ // skip the next quote
+        // Preserve escaped quotes without changing the input text.
+        current += ch + next
+        i++ // skip the second quote in the escaped pair
       } else {
         inQuotes = !inQuotes
+        current += ch
       }
-      current += ch
     } else if (ch === '\n' && !inQuotes) {
       rows.push(current)
       current = ''
@@ -57,7 +57,10 @@ function splitCsvRows(text: string): string[] {
 
 const CHUNK_SIZE = 500
 
-export async function parseCsvFile(file: File, callbacks: ParseCallbacks = {}): Promise<ParseResult> {
+export async function parseCsvFile(
+  file: File,
+  callbacks: ParseCallbacks = {},
+): Promise<ParseResult> {
   const text = await readFileAsText(file)
 
   // Split into rows, respecting quoted fields
