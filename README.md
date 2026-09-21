@@ -14,7 +14,7 @@ Client-side CSV parser built with Nuxt 3, Vue 3, and TypeScript. Upload a CSV fi
 ## Architecture
 
 - `/` — Home page: drag-and-drop CSV upload with progress bar. **Prerendered at build time** (static HTML via `nuxt generate`).
-- `/results` — Results page: interactive data table with sorting, filtering, column visibility toggling, pagination, and CSV export. **Client-side only** (SPA), since data is parsed in the browser.
+- `/results` — Results page: interactive data table or card view with sorting, filtering, column visibility toggling, pagination, and CSV export. **Client-side only** (SPA), since data is parsed in the browser.
 
 ## Setup
 

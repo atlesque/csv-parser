@@ -1,17 +1,46 @@
 <template>
   <div class="space-y-4">
     <!-- Search -->
-    <div>
+    <div class="flex flex-wrap items-center gap-3">
       <input
         v-model="globalFilter"
         type="text"
         placeholder="Search all columns..."
-        class="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 px-3 py-2 text-sm text-gray-900 dark:text-gray-100 placeholder:text-gray-400 dark:placeholder:text-gray-500 focus:border-gray-900 dark:focus:border-gray-100 focus:outline-none"
+        class="min-w-48 flex-1 rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 placeholder:text-gray-400 focus:border-gray-900 focus:outline-none dark:border-gray-600 dark:bg-gray-900 dark:text-gray-100 dark:placeholder:text-gray-500 dark:focus:border-gray-100"
       />
+
+      <div
+        class="inline-flex shrink-0 rounded-lg border border-gray-300 p-0.5 dark:border-gray-600"
+        role="group"
+        aria-label="View mode"
+      >
+        <button
+          type="button"
+          class="rounded-md px-3 py-1.5 text-sm transition-colors"
+          :class="viewMode === 'table'
+            ? 'bg-gray-900 text-white dark:bg-gray-100 dark:text-gray-900'
+            : 'text-gray-600 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-800'"
+          :aria-pressed="viewMode === 'table'"
+          @click="viewMode = 'table'"
+        >
+          Table
+        </button>
+        <button
+          type="button"
+          class="rounded-md px-3 py-1.5 text-sm transition-colors"
+          :class="viewMode === 'cards'
+            ? 'bg-gray-900 text-white dark:bg-gray-100 dark:text-gray-900'
+            : 'text-gray-600 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-800'"
+          :aria-pressed="viewMode === 'cards'"
+          @click="viewMode = 'cards'"
+        >
+          Cards
+        </button>
+      </div>
     </div>
 
     <!-- Table -->
-    <div class="overflow-x-auto rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900">
+    <div v-if="viewMode === 'table'" class="overflow-x-auto rounded-xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-gray-900">
       <table class="w-full text-sm">
         <thead>
           <tr
@@ -22,7 +51,7 @@
             <th
               v-for="header in headerGroup.headers"
               :key="header.id"
-              class="px-4 py-3 text-left font-medium text-gray-500 dark:text-gray-400 select-none"
+              class="select-none px-4 py-3 text-left font-medium text-gray-500 dark:text-gray-400"
               :class="{ 'cursor-pointer hover:text-gray-900 dark:hover:text-gray-100': header.column.getCanSort() }"
               @click="header.column.getCanSort() && header.column.toggleSorting()"
             >
@@ -47,7 +76,7 @@
             <td
               v-for="cell in row.getVisibleCells()"
               :key="cell.id"
-              class="px-4 py-2.5 text-gray-700 dark:text-gray-300 whitespace-nowrap max-w-xs truncate"
+              class="max-w-xs truncate whitespace-nowrap px-4 py-2.5 text-gray-700 dark:text-gray-300"
             >
               <FlexRender :render="cell.column.columnDef.cell" :props="cell.getContext()" />
             </td>
@@ -63,6 +92,8 @@
         </tbody>
       </table>
     </div>
+
+    <CsvCardView v-else :table="table" />
 
     <!-- Pagination -->
     <div v-if="table.getPageCount() > 1" class="flex flex-wrap items-center justify-between gap-3">
@@ -112,12 +143,14 @@ import {
 } from '@tanstack/vue-table'
 import { computed, h, ref } from 'vue'
 import CellContent from '~/components/CellContent.vue'
+import CsvCardView from '~/components/CsvCardView.vue'
 import { formatCellValue } from '~/lib/utils'
 import { useCsvStore } from '~/stores/csv'
 import type { CsvRow } from '~/types/csv'
 
 const csvStore = useCsvStore()
 const globalFilter = ref('')
+const viewMode = ref<'table' | 'cards'>('table')
 const pageSizes = [25, 50, 100, 250]
 
 const columnHelper = createColumnHelper<CsvRow>()
