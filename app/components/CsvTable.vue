@@ -1,13 +1,21 @@
 <template>
   <div class="space-y-4">
     <!-- Search -->
-    <div>
+    <div class="flex items-center gap-2">
       <input
         v-model="globalFilter"
         type="text"
         placeholder="Search all columns..."
-        class="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 px-3 py-2 text-sm text-gray-900 dark:text-gray-100 placeholder:text-gray-400 dark:placeholder:text-gray-500 focus:border-gray-900 dark:focus:border-gray-100 focus:outline-none"
+        class="min-w-0 flex-1 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 px-3 py-2 text-sm text-gray-900 dark:text-gray-100 placeholder:text-gray-400 dark:placeholder:text-gray-500 focus:border-gray-900 dark:focus:border-gray-100 focus:outline-none"
       />
+      <button
+        v-if="hasOverflowingCells"
+        type="button"
+        class="shrink-0 rounded-lg border border-gray-300 dark:border-gray-600 px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+        @click="toggleAllRows"
+      >
+        {{ allOverflowingRowsExpanded ? 'Collapse all' : 'Expand all' }}
+      </button>
     </div>
 
     <!-- Table -->
@@ -47,9 +55,62 @@
             <td
               v-for="cell in row.getVisibleCells()"
               :key="cell.id"
-              class="px-4 py-2.5 text-gray-700 dark:text-gray-300 whitespace-nowrap max-w-xs truncate"
+              :title="formatCellValue(cell.getValue())"
+              :class="[
+                'px-4 py-2.5 align-top text-gray-700 dark:text-gray-300',
+                isRowExpanded(row.id) ? 'whitespace-normal' : 'whitespace-nowrap',
+              ]"
             >
-              <FlexRender :render="cell.column.columnDef.cell" :props="cell.getContext()" />
+              <div
+                class="relative max-w-xs"
+              >
+                <div
+                  :ref="(element) => setCellElement(cell.id, row.id, element)"
+                  :class="[
+                    isRowExpanded(row.id)
+                      ? hasCellOverflow(cell.id)
+                        ? 'whitespace-normal break-words pr-8'
+                        : 'whitespace-normal break-words'
+                      : hasCellOverflow(cell.id)
+                        ? 'truncate pr-8'
+                        : 'truncate',
+                  ]"
+                >
+                  <FlexRender :render="cell.column.columnDef.cell" :props="cell.getContext()" />
+                </div>
+                <button
+                  v-if="hasCellOverflow(cell.id)"
+                  type="button"
+                  class="absolute right-0 top-1/2 inline-flex h-6 w-6 -translate-y-1/2 items-center justify-center rounded-md border border-gray-200 bg-white/95 text-gray-500 shadow-sm hover:bg-gray-100 hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-gray-400 dark:border-gray-700 dark:bg-gray-900/95 dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-gray-100 dark:focus:ring-gray-500"
+                  :aria-label="isRowExpanded(row.id) ? 'Collapse row' : `Expand row to view full ${cell.column.id}`"
+                  :title="isRowExpanded(row.id) ? 'Collapse row' : 'Expand row to view full value'"
+                  @click.stop="toggleRow(row.id)"
+                >
+                  <svg
+                    v-if="!isRowExpanded(row.id)"
+                    aria-hidden="true"
+                    class="h-4 w-4"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="1.8"
+                  >
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12s3.75-6.75 9.75-6.75S21.75 12 21.75 12 18 18.75 12 18.75 2.25 12 2.25 12Z" />
+                    <circle cx="12" cy="12" r="2.75" />
+                  </svg>
+                  <svg
+                    v-else
+                    aria-hidden="true"
+                    class="h-4 w-4"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="1.8"
+                  >
+                    <path stroke-linecap="round" stroke-linejoin="round" d="m5 15 7-7 7 7" />
+                  </svg>
+                </button>
+              </div>
             </td>
           </tr>
           <tr v-if="table.getRowModel().rows.length === 0">
@@ -110,7 +171,7 @@ import {
   getSortedRowModel,
   useVueTable,
 } from '@tanstack/vue-table'
-import { computed, h, ref } from 'vue'
+import { computed, h, onMounted, onUnmounted, onUpdated, ref } from 'vue'
 import CellContent from '~/components/CellContent.vue'
 import { formatCellValue } from '~/lib/utils'
 import { useCsvStore } from '~/stores/csv'
@@ -119,6 +180,114 @@ import type { CsvRow } from '~/types/csv'
 const csvStore = useCsvStore()
 const globalFilter = ref('')
 const pageSizes = [25, 50, 100, 250]
+const expandedRows = ref(new Set<string>())
+const cellElements = new Map<string, HTMLElement>()
+const cellRowIds = new Map<string, string>()
+const overflowingCellIds = ref(new Set<string>())
+const overflowingRowIds = ref(new Set<string>())
+
+const hasOverflowingCells = computed(() => overflowingCellIds.value.size > 0)
+const allOverflowingRowsExpanded = computed(
+  () =>
+    overflowingRowIds.value.size > 0 &&
+    Array.from(overflowingRowIds.value).every((rowId) => isRowExpanded(rowId)),
+)
+
+function isRowExpanded(rowId: string) {
+  return expandedRows.value.has(rowId)
+}
+
+function toggleRow(rowId: string) {
+  const nextExpandedRows = new Set(expandedRows.value)
+
+  if (nextExpandedRows.has(rowId)) {
+    nextExpandedRows.delete(rowId)
+  } else {
+    nextExpandedRows.add(rowId)
+  }
+
+  expandedRows.value = nextExpandedRows
+}
+
+function toggleAllRows() {
+  const nextExpandedRows = new Set(expandedRows.value)
+
+  if (allOverflowingRowsExpanded.value) {
+    for (const rowId of overflowingRowIds.value) {
+      nextExpandedRows.delete(rowId)
+    }
+  } else {
+    for (const rowId of overflowingRowIds.value) {
+      nextExpandedRows.add(rowId)
+    }
+  }
+
+  expandedRows.value = nextExpandedRows
+}
+
+function hasCellOverflow(cellId: string) {
+  return overflowingCellIds.value.has(cellId)
+}
+
+function setCellElement(cellId: string, rowId: string, element: Element | null) {
+  if (element instanceof HTMLElement) {
+    cellElements.set(cellId, element)
+    cellRowIds.set(cellId, rowId)
+  } else {
+    cellElements.delete(cellId)
+    cellRowIds.delete(cellId)
+  }
+}
+
+function setsAreEqual(first: Set<string>, second: Set<string>) {
+  return first.size === second.size && Array.from(first).every((value) => second.has(value))
+}
+
+function measureCellOverflow() {
+  const nextOverflowingCellIds = new Set<string>()
+
+  for (const [cellId, element] of cellElements) {
+    const rowId = cellRowIds.get(cellId)
+
+    if (rowId && isRowExpanded(rowId)) {
+      if (overflowingCellIds.value.has(cellId)) {
+        nextOverflowingCellIds.add(cellId)
+      }
+      continue
+    }
+
+    if (element.scrollWidth > element.clientWidth || element.scrollHeight > element.clientHeight) {
+      nextOverflowingCellIds.add(cellId)
+    }
+  }
+
+  const nextOverflowingRowIds = new Set<string>()
+  for (const cellId of nextOverflowingCellIds) {
+    const rowId = cellRowIds.get(cellId)
+    if (rowId) {
+      nextOverflowingRowIds.add(rowId)
+    }
+  }
+
+  if (!setsAreEqual(overflowingCellIds.value, nextOverflowingCellIds)) {
+    overflowingCellIds.value = nextOverflowingCellIds
+  }
+
+  if (!setsAreEqual(overflowingRowIds.value, nextOverflowingRowIds)) {
+    overflowingRowIds.value = nextOverflowingRowIds
+  }
+}
+
+onMounted(() => {
+  measureCellOverflow()
+  window.addEventListener('resize', measureCellOverflow)
+})
+
+onUpdated(measureCellOverflow)
+
+onUnmounted(() => {
+  window.removeEventListener('resize', measureCellOverflow)
+})
 
 const columnHelper = createColumnHelper<CsvRow>()
 
