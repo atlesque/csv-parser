@@ -38,6 +38,18 @@
         </button>
       </div>
       <button
+        type="button"
+        class="shrink-0 rounded-lg border px-3 py-2 text-sm font-medium transition-colors"
+        :class="csvStore.plainText
+          ? 'border-gray-900 bg-gray-900 text-white dark:border-gray-100 dark:bg-gray-100 dark:text-gray-900'
+          : 'border-gray-300 text-gray-700 hover:bg-gray-100 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-800'"
+        :aria-pressed="csvStore.plainText"
+        title="Show every value exactly as it appears in the file, with no number formatting"
+        @click="csvStore.plainText = !csvStore.plainText"
+      >
+        Plain text
+      </button>
+      <button
         v-if="hasOverflowingCells"
         type="button"
         class="shrink-0 rounded-lg border border-gray-300 dark:border-gray-600 px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
@@ -48,7 +60,7 @@
     </div>
 
     <!-- Table -->
-    <div v-if="viewMode === 'table'" class="overflow-x-auto rounded-xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-gray-900">
+    <div v-if="viewMode === 'table'" ref="tableContainer" class="overflow-x-auto rounded-xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-gray-900">
       <table class="w-full text-sm">
         <thead>
           <tr
@@ -84,17 +96,18 @@
             <td
               v-for="cell in row.getVisibleCells()"
               :key="cell.id"
-              :title="formatCellValue(cell.getValue())"
+              :title="formatCellValue(cell.getValue(), csvStore.plainText)"
               :class="[
                 'px-4 py-2.5 align-top text-gray-700 dark:text-gray-300',
                 isRowExpanded(row.id) ? 'whitespace-normal' : 'whitespace-nowrap',
               ]"
             >
               <div
-                class="relative max-w-xs"
+                class="relative"
+                style="max-width: var(--cell-max-width, none)"
               >
                 <div
-                  :ref="(element) => setCellElement(cell.id, row.id, element)"
+                  :ref="(element) => setCellElement(cell.id, row.id, cell.column.id, element)"
                   :class="[
                     isRowExpanded(row.id)
                       ? hasCellOverflow(cell.id)
@@ -202,10 +215,10 @@ import {
   getSortedRowModel,
   useVueTable,
 } from '@tanstack/vue-table'
-import { computed, h, onMounted, onUnmounted, onUpdated, ref } from 'vue'
+import { computed, h, onMounted, onUnmounted, onUpdated, ref, watch } from 'vue'
 import CellContent from '~/components/CellContent.vue'
 import CsvCardView from '~/components/CsvCardView.vue'
-import { formatCellValue } from '~/lib/utils'
+import { formatCellValue, parseTypedValue } from '~/lib/utils'
 import { useCsvStore } from '~/stores/csv'
 import type { CsvRow } from '~/types/csv'
 
@@ -216,6 +229,17 @@ const pageSizes = [25, 50, 100, 250]
 const expandedRows = ref(new Set<string>())
 const cellElements = new Map<string, HTMLElement>()
 const cellRowIds = new Map<string, string>()
+const cellColumnIds = new Map<string, string>()
+// Width each cell's value needs on one line, kept while its row is expanded.
+const naturalCellWidths = new Map<string, number>()
+const tableContainer = ref<HTMLElement | null>(null)
+const MIN_CELL_MAX_WIDTH = 320 // matches the old fixed max-w-xs
+const CELL_HORIZONTAL_PADDING = 32 // px-4 on each side of the <td>
+// Widest a cell may grow before it truncates. Infinity means every column fits.
+let cellMaxWidth = Number.POSITIVE_INFINITY
+let resizeObserver: ResizeObserver | null = null
+let resizeFrame = 0
+
 const overflowingCellIds = ref(new Set<string>())
 const overflowingRowIds = ref(new Set<string>())
 
@@ -262,42 +286,81 @@ function hasCellOverflow(cellId: string) {
   return overflowingCellIds.value.has(cellId)
 }
 
-function setCellElement(cellId: string, rowId: string, element: Element | null) {
+function setCellElement(cellId: string, rowId: string, columnId: string, element: Element | null) {
   if (element instanceof HTMLElement) {
     cellElements.set(cellId, element)
     cellRowIds.set(cellId, rowId)
+    cellColumnIds.set(cellId, columnId)
   } else {
     cellElements.delete(cellId)
     cellRowIds.delete(cellId)
+    cellColumnIds.delete(cellId)
+    naturalCellWidths.delete(cellId)
   }
+}
+
+/**
+ * Find the widest cell limit that lets the table fit its container. Narrow
+ * columns keep their full width and the remaining space is shared equally
+ * between the wider ones. Returns Infinity when nothing needs truncating.
+ */
+function computeCellMaxWidth(containerWidth: number): number {
+  const columnWidths = new Map<string, number>()
+  for (const [cellId, width] of naturalCellWidths) {
+    const columnId = cellColumnIds.get(cellId)
+    if (columnId) {
+      columnWidths.set(columnId, Math.max(columnWidths.get(columnId) ?? 0, width))
+    }
+  }
+
+  const widths = Array.from(columnWidths.values()).sort((a, b) => a - b)
+  let remaining = containerWidth - widths.length * CELL_HORIZONTAL_PADDING
+
+  for (let i = 0; i < widths.length; i++) {
+    const share = remaining / (widths.length - i)
+    if (widths[i] > share) {
+      return Math.max(Math.floor(share), MIN_CELL_MAX_WIDTH)
+    }
+    remaining -= widths[i]
+  }
+
+  return Number.POSITIVE_INFINITY
 }
 
 function setsAreEqual(first: Set<string>, second: Set<string>) {
   return first.size === second.size && Array.from(first).every((value) => second.has(value))
 }
 
-function measureCellOverflow() {
-  const nextOverflowingCellIds = new Set<string>()
-
+/** Read how wide each collapsed cell's value is on one line. Reads only, no writes. */
+function measureNaturalWidths() {
   for (const [cellId, element] of cellElements) {
     const rowId = cellRowIds.get(cellId)
-
-    if (rowId && isRowExpanded(rowId)) {
-      if (overflowingCellIds.value.has(cellId)) {
-        nextOverflowingCellIds.add(cellId)
-      }
-      continue
-    }
-
-    if (element.scrollWidth > element.clientWidth || element.scrollHeight > element.clientHeight) {
-      nextOverflowingCellIds.add(cellId)
-    }
+    const content = element.firstElementChild
+    if (!rowId || isRowExpanded(rowId) || !content) continue
+    naturalCellWidths.set(cellId, Math.ceil(content.getBoundingClientRect().width))
   }
+}
 
+/**
+ * Apply the width limit through a CSS variable so resizing never re-renders
+ * the table. Only a change in which cells overflow updates Vue state.
+ */
+function applyCellMaxWidth() {
+  const container = tableContainer.value
+  if (!container) return
+
+  cellMaxWidth = computeCellMaxWidth(container.clientWidth)
+  container.style.setProperty(
+    '--cell-max-width',
+    Number.isFinite(cellMaxWidth) ? `${cellMaxWidth}px` : 'none',
+  )
+
+  const nextOverflowingCellIds = new Set<string>()
   const nextOverflowingRowIds = new Set<string>()
-  for (const cellId of nextOverflowingCellIds) {
+  for (const [cellId, width] of naturalCellWidths) {
     const rowId = cellRowIds.get(cellId)
-    if (rowId) {
+    if (rowId && width > cellMaxWidth) {
+      nextOverflowingCellIds.add(cellId)
       nextOverflowingRowIds.add(rowId)
     }
   }
@@ -311,25 +374,49 @@ function measureCellOverflow() {
   }
 }
 
+function measureCellOverflow() {
+  measureNaturalWidths()
+  applyCellMaxWidth()
+}
+
+function onContainerResize() {
+  cancelAnimationFrame(resizeFrame)
+  resizeFrame = requestAnimationFrame(applyCellMaxWidth)
+}
+
+watch(
+  tableContainer,
+  (container, previous) => {
+    if (previous) resizeObserver?.unobserve(previous)
+    if (container) resizeObserver?.observe(container)
+  },
+  { flush: 'post' },
+)
+
 onMounted(() => {
+  resizeObserver = new ResizeObserver(onContainerResize)
+  if (tableContainer.value) resizeObserver.observe(tableContainer.value)
   measureCellOverflow()
-  window.addEventListener('resize', measureCellOverflow)
 })
 
 onUpdated(measureCellOverflow)
 
 onUnmounted(() => {
-  window.removeEventListener('resize', measureCellOverflow)
+  resizeObserver?.disconnect()
+  cancelAnimationFrame(resizeFrame)
 })
 
 const columnHelper = createColumnHelper<CsvRow>()
 
 const columnDefs = computed(() =>
   csvStore.columns.map((col) =>
-    columnHelper.accessor(col, {
+    // Use an accessor function so dotted headers like "labels.rrnHash" are
+    // read as a literal key instead of a nested property path.
+    columnHelper.accessor((row) => (csvStore.plainText ? row[col] : parseTypedValue(row[col])), {
+      id: col,
       header: () => col,
       cell: (info) => {
-        const text = formatCellValue(info.getValue())
+        const text = formatCellValue(info.getValue(), csvStore.plainText)
         return h(CellContent, { text, query: globalFilter.value })
       },
       enableSorting: true,
