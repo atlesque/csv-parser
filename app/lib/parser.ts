@@ -81,7 +81,9 @@ export async function parseCsvFile(
     await new Promise<void>((resolve, reject) => {
       Papa.parse<CsvRow>(chunk, {
         header: true,
-        dynamicTyping: true,
+        // Keep every value as the exact text from the file. Typing happens at
+        // display time so values like "0501" never lose their leading zeros.
+        dynamicTyping: false,
         skipEmptyLines: true,
         complete: (results) => {
           parsedRows.push(...results.data)

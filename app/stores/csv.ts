@@ -1,7 +1,18 @@
 import { defineStore } from 'pinia'
-import { computed, ref } from 'vue'
+import { computed, ref, watch } from 'vue'
 import { parseCsvFile } from '~/lib/parser'
 import type { CsvRow } from '~/types/csv'
+
+const PLAIN_TEXT_STORAGE_KEY = 'csv-parser-plain-text'
+
+function readPlainTextPreference(): boolean {
+  if (import.meta.server) return false
+  try {
+    return localStorage.getItem(PLAIN_TEXT_STORAGE_KEY) === 'true'
+  } catch {
+    return false
+  }
+}
 
 export const useCsvStore = defineStore('csv', () => {
   const file = ref<File | null>(null)
@@ -9,6 +20,15 @@ export const useCsvStore = defineStore('csv', () => {
   const columns = ref<string[]>([])
   const loadingProgress = ref(0)
   const parseError = ref<string | null>(null)
+  const plainText = ref(readPlainTextPreference())
+
+  watch(plainText, (value) => {
+    try {
+      localStorage.setItem(PLAIN_TEXT_STORAGE_KEY, String(value))
+    } catch {
+      // Storage can be unavailable (private mode); the toggle still works.
+    }
+  })
 
   const hasData = computed(() => rawData.value.length > 0)
   const isParsing = computed(() => loadingProgress.value > 0 && loadingProgress.value < 100)
@@ -60,6 +80,7 @@ export const useCsvStore = defineStore('csv', () => {
     columns,
     loadingProgress,
     parseError,
+    plainText,
     hasData,
     isParsing,
     rowCount,

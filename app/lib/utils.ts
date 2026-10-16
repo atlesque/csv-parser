@@ -1,9 +1,37 @@
 import Papa from 'papaparse'
 import type { CsvRow } from '~/types/csv'
 
-export function formatCellValue(value: unknown): string {
+const NUMBER_PATTERN = /^-?(?:0|[1-9]\d*)(?:\.\d+)?(?:[eE][-+]?\d+)?$/
+
+/**
+ * Convert raw CSV text into a typed value for formatted display and sorting.
+ * Values that would not survive the round trip (leading zeros, integers past
+ * the safe range) stay as text.
+ */
+export function parseTypedValue(raw: unknown): string | number | boolean | null {
+  if (raw === null || raw === undefined || raw === '') {
+    return null
+  }
+  if (typeof raw !== 'string') {
+    return raw as number | boolean
+  }
+  if (raw === 'true' || raw === 'TRUE') return true
+  if (raw === 'false' || raw === 'FALSE') return false
+  if (NUMBER_PATTERN.test(raw)) {
+    const num = Number(raw)
+    if (Number.isFinite(num) && (!Number.isInteger(num) || Number.isSafeInteger(num))) {
+      return num
+    }
+  }
+  return raw
+}
+
+export function formatCellValue(value: unknown, plainText = false): string {
   if (value === null || value === undefined) {
     return ''
+  }
+  if (plainText) {
+    return String(value)
   }
   if (typeof value === 'boolean') {
     return value ? 'true' : 'false'

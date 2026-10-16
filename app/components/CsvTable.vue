@@ -38,6 +38,18 @@
         </button>
       </div>
       <button
+        type="button"
+        class="shrink-0 rounded-lg border px-3 py-2 text-sm font-medium transition-colors"
+        :class="csvStore.plainText
+          ? 'border-gray-900 bg-gray-900 text-white dark:border-gray-100 dark:bg-gray-100 dark:text-gray-900'
+          : 'border-gray-300 text-gray-700 hover:bg-gray-100 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-800'"
+        :aria-pressed="csvStore.plainText"
+        title="Show every value exactly as it appears in the file, with no number formatting"
+        @click="csvStore.plainText = !csvStore.plainText"
+      >
+        Plain text
+      </button>
+      <button
         v-if="hasOverflowingCells"
         type="button"
         class="shrink-0 rounded-lg border border-gray-300 dark:border-gray-600 px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
@@ -84,7 +96,7 @@
             <td
               v-for="cell in row.getVisibleCells()"
               :key="cell.id"
-              :title="formatCellValue(cell.getValue())"
+              :title="formatCellValue(cell.getValue(), csvStore.plainText)"
               :class="[
                 'px-4 py-2.5 align-top text-gray-700 dark:text-gray-300',
                 isRowExpanded(row.id) ? 'whitespace-normal' : 'whitespace-nowrap',
@@ -205,7 +217,7 @@ import {
 import { computed, h, onMounted, onUnmounted, onUpdated, ref } from 'vue'
 import CellContent from '~/components/CellContent.vue'
 import CsvCardView from '~/components/CsvCardView.vue'
-import { formatCellValue } from '~/lib/utils'
+import { formatCellValue, parseTypedValue } from '~/lib/utils'
 import { useCsvStore } from '~/stores/csv'
 import type { CsvRow } from '~/types/csv'
 
@@ -326,10 +338,13 @@ const columnHelper = createColumnHelper<CsvRow>()
 
 const columnDefs = computed(() =>
   csvStore.columns.map((col) =>
-    columnHelper.accessor(col, {
+    // Use an accessor function so dotted headers like "labels.rrnHash" are
+    // read as a literal key instead of a nested property path.
+    columnHelper.accessor((row) => (csvStore.plainText ? row[col] : parseTypedValue(row[col])), {
+      id: col,
       header: () => col,
       cell: (info) => {
-        const text = formatCellValue(info.getValue())
+        const text = formatCellValue(info.getValue(), csvStore.plainText)
         return h(CellContent, { text, query: globalFilter.value })
       },
       enableSorting: true,
