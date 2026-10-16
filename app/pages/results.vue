@@ -30,7 +30,7 @@
         </div>
       </div>
 
-      <CsvTable ref="tableRef" />
+      <CsvTable :key="csvStore.loadId" ref="tableRef" />
     </div>
   </div>
 </template>
