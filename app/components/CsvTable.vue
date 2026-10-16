@@ -60,7 +60,7 @@
     </div>
 
     <!-- Table -->
-    <div v-if="viewMode === 'table'" class="overflow-x-auto rounded-xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-gray-900">
+    <div v-if="viewMode === 'table'" ref="tableContainer" class="overflow-x-auto rounded-xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-gray-900">
       <table class="w-full text-sm">
         <thead>
           <tr
@@ -103,10 +103,11 @@
               ]"
             >
               <div
-                class="relative max-w-xs"
+                class="relative"
+                :style="cellMaxWidthStyle"
               >
                 <div
-                  :ref="(element) => setCellElement(cell.id, row.id, element)"
+                  :ref="(element) => setCellElement(cell.id, row.id, cell.column.id, element)"
                   :class="[
                     isRowExpanded(row.id)
                       ? hasCellOverflow(cell.id)
@@ -228,6 +229,17 @@ const pageSizes = [25, 50, 100, 250]
 const expandedRows = ref(new Set<string>())
 const cellElements = new Map<string, HTMLElement>()
 const cellRowIds = new Map<string, string>()
+const cellColumnIds = new Map<string, string>()
+const naturalCellWidths = new Map<string, number>()
+const tableContainer = ref<HTMLElement | null>(null)
+// Widest a cell may grow before it truncates. Infinity means every column fits.
+const cellMaxWidth = ref(Number.POSITIVE_INFINITY)
+const MIN_CELL_MAX_WIDTH = 320 // matches the old fixed max-w-xs
+const CELL_HORIZONTAL_PADDING = 32 // px-4 on each side of the <td>
+
+const cellMaxWidthStyle = computed(() =>
+  Number.isFinite(cellMaxWidth.value) ? { maxWidth: `${cellMaxWidth.value}px` } : undefined,
+)
 const overflowingCellIds = ref(new Set<string>())
 const overflowingRowIds = ref(new Set<string>())
 
@@ -274,14 +286,55 @@ function hasCellOverflow(cellId: string) {
   return overflowingCellIds.value.has(cellId)
 }
 
-function setCellElement(cellId: string, rowId: string, element: Element | null) {
+function setCellElement(cellId: string, rowId: string, columnId: string, element: Element | null) {
   if (element instanceof HTMLElement) {
     cellElements.set(cellId, element)
     cellRowIds.set(cellId, rowId)
+    cellColumnIds.set(cellId, columnId)
   } else {
     cellElements.delete(cellId)
     cellRowIds.delete(cellId)
+    cellColumnIds.delete(cellId)
+    naturalCellWidths.delete(cellId)
   }
+}
+
+/**
+ * Find the widest cell limit that lets the table fit its container. Narrow
+ * columns keep their full width and the remaining space is shared equally
+ * between the wider ones. Returns Infinity when nothing needs truncating.
+ */
+function computeCellMaxWidth(): number {
+  const container = tableContainer.value
+  if (!container) return Number.POSITIVE_INFINITY
+
+  const columnWidths = new Map<string, number>()
+  for (const [cellId, element] of cellElements) {
+    const rowId = cellRowIds.get(cellId)
+    const columnId = cellColumnIds.get(cellId)
+    if (!rowId || !columnId) continue
+
+    // Expanded rows wrap, so reuse the width measured while they were on one line.
+    if (!isRowExpanded(rowId)) {
+      const paddingRight = Number.parseFloat(getComputedStyle(element).paddingRight) || 0
+      naturalCellWidths.set(cellId, Math.ceil(element.scrollWidth - paddingRight))
+    }
+    const width = naturalCellWidths.get(cellId) ?? 0
+    columnWidths.set(columnId, Math.max(columnWidths.get(columnId) ?? 0, width))
+  }
+
+  const widths = Array.from(columnWidths.values()).sort((a, b) => a - b)
+  let remaining = container.clientWidth - widths.length * CELL_HORIZONTAL_PADDING
+
+  for (let i = 0; i < widths.length; i++) {
+    const share = remaining / (widths.length - i)
+    if (widths[i] > share) {
+      return Math.max(Math.floor(share), MIN_CELL_MAX_WIDTH)
+    }
+    remaining -= widths[i]
+  }
+
+  return Number.POSITIVE_INFINITY
 }
 
 function setsAreEqual(first: Set<string>, second: Set<string>) {
@@ -289,13 +342,21 @@ function setsAreEqual(first: Set<string>, second: Set<string>) {
 }
 
 function measureCellOverflow() {
+  const nextCellMaxWidth = computeCellMaxWidth()
+  if (nextCellMaxWidth !== cellMaxWidth.value) {
+    // The new limit re-renders the cells; overflow is measured on that update.
+    cellMaxWidth.value = nextCellMaxWidth
+    return
+  }
+
   const nextOverflowingCellIds = new Set<string>()
 
   for (const [cellId, element] of cellElements) {
     const rowId = cellRowIds.get(cellId)
 
     if (rowId && isRowExpanded(rowId)) {
-      if (overflowingCellIds.value.has(cellId)) {
+      // Keep the collapse button only while the value is still wider than its cell.
+      if ((naturalCellWidths.get(cellId) ?? 0) > cellMaxWidth.value) {
         nextOverflowingCellIds.add(cellId)
       }
       continue
