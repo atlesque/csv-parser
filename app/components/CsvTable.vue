@@ -104,7 +104,7 @@
             >
               <div
                 class="relative"
-                :style="cellMaxWidthStyle"
+                style="max-width: var(--cell-max-width, none)"
               >
                 <div
                   :ref="(element) => setCellElement(cell.id, row.id, cell.column.id, element)"
@@ -215,7 +215,7 @@ import {
   getSortedRowModel,
   useVueTable,
 } from '@tanstack/vue-table'
-import { computed, h, onMounted, onUnmounted, onUpdated, ref } from 'vue'
+import { computed, h, onMounted, onUnmounted, onUpdated, ref, watch } from 'vue'
 import CellContent from '~/components/CellContent.vue'
 import CsvCardView from '~/components/CsvCardView.vue'
 import { formatCellValue, parseTypedValue } from '~/lib/utils'
@@ -230,16 +230,16 @@ const expandedRows = ref(new Set<string>())
 const cellElements = new Map<string, HTMLElement>()
 const cellRowIds = new Map<string, string>()
 const cellColumnIds = new Map<string, string>()
+// Width each cell's value needs on one line, kept while its row is expanded.
 const naturalCellWidths = new Map<string, number>()
 const tableContainer = ref<HTMLElement | null>(null)
-// Widest a cell may grow before it truncates. Infinity means every column fits.
-const cellMaxWidth = ref(Number.POSITIVE_INFINITY)
 const MIN_CELL_MAX_WIDTH = 320 // matches the old fixed max-w-xs
 const CELL_HORIZONTAL_PADDING = 32 // px-4 on each side of the <td>
+// Widest a cell may grow before it truncates. Infinity means every column fits.
+let cellMaxWidth = Number.POSITIVE_INFINITY
+let resizeObserver: ResizeObserver | null = null
+let resizeFrame = 0
 
-const cellMaxWidthStyle = computed(() =>
-  Number.isFinite(cellMaxWidth.value) ? { maxWidth: `${cellMaxWidth.value}px` } : undefined,
-)
 const overflowingCellIds = ref(new Set<string>())
 const overflowingRowIds = ref(new Set<string>())
 
@@ -304,27 +304,17 @@ function setCellElement(cellId: string, rowId: string, columnId: string, element
  * columns keep their full width and the remaining space is shared equally
  * between the wider ones. Returns Infinity when nothing needs truncating.
  */
-function computeCellMaxWidth(): number {
-  const container = tableContainer.value
-  if (!container) return Number.POSITIVE_INFINITY
-
+function computeCellMaxWidth(containerWidth: number): number {
   const columnWidths = new Map<string, number>()
-  for (const [cellId, element] of cellElements) {
-    const rowId = cellRowIds.get(cellId)
+  for (const [cellId, width] of naturalCellWidths) {
     const columnId = cellColumnIds.get(cellId)
-    if (!rowId || !columnId) continue
-
-    // Expanded rows wrap, so reuse the width measured while they were on one line.
-    if (!isRowExpanded(rowId)) {
-      const paddingRight = Number.parseFloat(getComputedStyle(element).paddingRight) || 0
-      naturalCellWidths.set(cellId, Math.ceil(element.scrollWidth - paddingRight))
+    if (columnId) {
+      columnWidths.set(columnId, Math.max(columnWidths.get(columnId) ?? 0, width))
     }
-    const width = naturalCellWidths.get(cellId) ?? 0
-    columnWidths.set(columnId, Math.max(columnWidths.get(columnId) ?? 0, width))
   }
 
   const widths = Array.from(columnWidths.values()).sort((a, b) => a - b)
-  let remaining = container.clientWidth - widths.length * CELL_HORIZONTAL_PADDING
+  let remaining = containerWidth - widths.length * CELL_HORIZONTAL_PADDING
 
   for (let i = 0; i < widths.length; i++) {
     const share = remaining / (widths.length - i)
@@ -341,36 +331,36 @@ function setsAreEqual(first: Set<string>, second: Set<string>) {
   return first.size === second.size && Array.from(first).every((value) => second.has(value))
 }
 
-function measureCellOverflow() {
-  const nextCellMaxWidth = computeCellMaxWidth()
-  if (nextCellMaxWidth !== cellMaxWidth.value) {
-    // The new limit re-renders the cells; overflow is measured on that update.
-    cellMaxWidth.value = nextCellMaxWidth
-    return
-  }
-
-  const nextOverflowingCellIds = new Set<string>()
-
+/** Read how wide each collapsed cell's value is on one line. Reads only, no writes. */
+function measureNaturalWidths() {
   for (const [cellId, element] of cellElements) {
     const rowId = cellRowIds.get(cellId)
-
-    if (rowId && isRowExpanded(rowId)) {
-      // Keep the collapse button only while the value is still wider than its cell.
-      if ((naturalCellWidths.get(cellId) ?? 0) > cellMaxWidth.value) {
-        nextOverflowingCellIds.add(cellId)
-      }
-      continue
-    }
-
-    if (element.scrollWidth > element.clientWidth || element.scrollHeight > element.clientHeight) {
-      nextOverflowingCellIds.add(cellId)
-    }
+    const content = element.firstElementChild
+    if (!rowId || isRowExpanded(rowId) || !content) continue
+    naturalCellWidths.set(cellId, Math.ceil(content.getBoundingClientRect().width))
   }
+}
 
+/**
+ * Apply the width limit through a CSS variable so resizing never re-renders
+ * the table. Only a change in which cells overflow updates Vue state.
+ */
+function applyCellMaxWidth() {
+  const container = tableContainer.value
+  if (!container) return
+
+  cellMaxWidth = computeCellMaxWidth(container.clientWidth)
+  container.style.setProperty(
+    '--cell-max-width',
+    Number.isFinite(cellMaxWidth) ? `${cellMaxWidth}px` : 'none',
+  )
+
+  const nextOverflowingCellIds = new Set<string>()
   const nextOverflowingRowIds = new Set<string>()
-  for (const cellId of nextOverflowingCellIds) {
+  for (const [cellId, width] of naturalCellWidths) {
     const rowId = cellRowIds.get(cellId)
-    if (rowId) {
+    if (rowId && width > cellMaxWidth) {
+      nextOverflowingCellIds.add(cellId)
       nextOverflowingRowIds.add(rowId)
     }
   }
@@ -384,15 +374,36 @@ function measureCellOverflow() {
   }
 }
 
+function measureCellOverflow() {
+  measureNaturalWidths()
+  applyCellMaxWidth()
+}
+
+function onContainerResize() {
+  cancelAnimationFrame(resizeFrame)
+  resizeFrame = requestAnimationFrame(applyCellMaxWidth)
+}
+
+watch(
+  tableContainer,
+  (container, previous) => {
+    if (previous) resizeObserver?.unobserve(previous)
+    if (container) resizeObserver?.observe(container)
+  },
+  { flush: 'post' },
+)
+
 onMounted(() => {
+  resizeObserver = new ResizeObserver(onContainerResize)
+  if (tableContainer.value) resizeObserver.observe(tableContainer.value)
   measureCellOverflow()
-  window.addEventListener('resize', measureCellOverflow)
 })
 
 onUpdated(measureCellOverflow)
 
 onUnmounted(() => {
-  window.removeEventListener('resize', measureCellOverflow)
+  resizeObserver?.disconnect()
+  cancelAnimationFrame(resizeFrame)
 })
 
 const columnHelper = createColumnHelper<CsvRow>()
