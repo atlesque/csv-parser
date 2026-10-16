@@ -1,16 +1,18 @@
-import { defineStore } from 'pinia'
+import { defineStore, skipHydrate } from 'pinia'
 import { computed, ref, watch } from 'vue'
 import { parseCsvFile } from '~/lib/parser'
 import type { CsvRow } from '~/types/csv'
 
-const PLAIN_TEXT_STORAGE_KEY = 'csv-parser-plain-text'
+// A new key so the old opt-in "plain text" setting doesn't override the new default.
+const DISPLAY_MODE_STORAGE_KEY = 'csv-parser-display-mode'
 
+// Plain text is the default; only an explicit choice of formatted mode turns it off.
 function readPlainTextPreference(): boolean {
-  if (import.meta.server) return false
+  if (import.meta.server) return true
   try {
-    return localStorage.getItem(PLAIN_TEXT_STORAGE_KEY) === 'true'
+    return localStorage.getItem(DISPLAY_MODE_STORAGE_KEY) !== 'formatted'
   } catch {
-    return false
+    return true
   }
 }
 
@@ -26,7 +28,7 @@ export const useCsvStore = defineStore('csv', () => {
 
   watch(plainText, (value) => {
     try {
-      localStorage.setItem(PLAIN_TEXT_STORAGE_KEY, String(value))
+      localStorage.setItem(DISPLAY_MODE_STORAGE_KEY, value ? 'plain' : 'formatted')
     } catch {
       // Storage can be unavailable (private mode); the toggle still works.
     }
@@ -83,7 +85,8 @@ export const useCsvStore = defineStore('csv', () => {
     columns,
     loadingProgress,
     parseError,
-    plainText,
+    // The prerendered page carries the server default, so read the saved choice on the client instead.
+    plainText: skipHydrate(plainText),
     loadId,
     hasData,
     isParsing,

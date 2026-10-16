@@ -37,18 +37,36 @@
           Cards
         </button>
       </div>
-      <button
-        type="button"
-        class="shrink-0 rounded-lg border px-3 py-2 text-sm font-medium transition-colors"
-        :class="csvStore.plainText
-          ? 'border-gray-900 bg-gray-900 text-white dark:border-gray-100 dark:bg-gray-100 dark:text-gray-900'
-          : 'border-gray-300 text-gray-700 hover:bg-gray-100 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-800'"
-        :aria-pressed="csvStore.plainText"
-        title="Show every value exactly as it appears in the file, with no number formatting"
-        @click="csvStore.plainText = !csvStore.plainText"
+      <div
+        class="inline-flex shrink-0 rounded-lg border border-gray-300 p-0.5 dark:border-gray-600"
+        role="group"
+        aria-label="Value display"
       >
-        Plain text
-      </button>
+        <button
+          type="button"
+          class="rounded-md px-3 py-1.5 text-sm transition-colors"
+          :class="csvStore.plainText
+            ? 'bg-gray-900 text-white dark:bg-gray-100 dark:text-gray-900'
+            : 'text-gray-600 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-800'"
+          :aria-pressed="csvStore.plainText"
+          title="Show every value exactly as it appears in the file"
+          @click="csvStore.plainText = true"
+        >
+          Plain text
+        </button>
+        <button
+          type="button"
+          class="rounded-md px-3 py-1.5 text-sm transition-colors"
+          :class="!csvStore.plainText
+            ? 'bg-gray-900 text-white dark:bg-gray-100 dark:text-gray-900'
+            : 'text-gray-600 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-800'"
+          :aria-pressed="!csvStore.plainText"
+          title="Format numbers with thousands separators"
+          @click="csvStore.plainText = false"
+        >
+          Formatted
+        </button>
+      </div>
       <button
         v-if="hasOverflowingCells"
         type="button"
@@ -408,23 +426,30 @@ onUnmounted(() => {
 
 const columnHelper = createColumnHelper<CsvRow>()
 
-const columnDefs = computed(() =>
-  csvStore.columns.map((col) =>
+const columnDefs = computed(() => {
+  const plainText = csvStore.plainText
+
+  return csvStore.columns.map((col) =>
     // Use an accessor function so dotted headers like "labels.rrnHash" are
     // read as a literal key instead of a nested property path.
-    columnHelper.accessor((row) => (csvStore.plainText ? row[col] : parseTypedValue(row[col])), {
+    columnHelper.accessor((row) => (plainText ? row[col] : parseTypedValue(row[col])), {
       id: col,
       header: () => col,
       cell: (info) => {
-        const text = formatCellValue(info.getValue(), csvStore.plainText)
+        const text = formatCellValue(info.getValue(), plainText)
         return h(CellContent, { text, query: globalFilter.value })
       },
       enableSorting: true,
     }),
-  ),
-)
+  )
+})
 
-const data = computed(() => csvStore.rawData)
+// TanStack caches each row's cell values until the data array changes, so
+// switching between plain and formatted mode hands it a fresh array.
+const data = computed(() => {
+  void csvStore.plainText
+  return csvStore.rawData.slice()
+})
 
 const table = useVueTable({
   get data() {
