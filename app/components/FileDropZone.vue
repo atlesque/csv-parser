@@ -4,12 +4,8 @@
       <div
         class="flex flex-col items-center gap-4 rounded-xl border-2 border-dashed border-gray-300 dark:border-gray-600 p-10 transition-colors"
         :class="{
-          'border-gray-900 dark:border-gray-100 bg-gray-50 dark:bg-gray-800/50': isDragActive,
           'cursor-pointer hover:border-gray-400 dark:hover:border-gray-500': !isParsing,
         }"
-        @dragover.prevent="isDragActive = true"
-        @dragleave.prevent="isDragActive = false"
-        @drop.prevent="onDrop"
         @click="openFileDialog"
       >
         <input
@@ -66,7 +62,6 @@ const emit = defineEmits<{
 
 const csvStore = useCsvStore()
 const fileInput = ref<HTMLInputElement | null>(null)
-const isDragActive = ref(false)
 const isParsing = computed(() => csvStore.loadingProgress > 0 && csvStore.loadingProgress < 100)
 
 function openFileDialog() {
@@ -79,14 +74,6 @@ function onFileSelected(event: Event) {
   const selectedFile = input.files?.[0]
   if (selectedFile) {
     handleFile(selectedFile)
-  }
-}
-
-function onDrop(event: DragEvent) {
-  isDragActive.value = false
-  const droppedFile = event.dataTransfer?.files?.[0]
-  if (droppedFile) {
-    handleFile(droppedFile)
   }
 }
 

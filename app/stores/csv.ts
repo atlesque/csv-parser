@@ -21,6 +21,8 @@ export const useCsvStore = defineStore('csv', () => {
   const loadingProgress = ref(0)
   const parseError = ref<string | null>(null)
   const plainText = ref(readPlainTextPreference())
+  // Bumped after every successful parse so views can reset per-file state.
+  const loadId = ref(0)
 
   watch(plainText, (value) => {
     try {
@@ -60,6 +62,7 @@ export const useCsvStore = defineStore('csv', () => {
       rawData.value = result.data
       columns.value = result.columns
       loadingProgress.value = 100
+      loadId.value++
     } catch (err) {
       parseError.value = err instanceof Error ? err.message : 'Unknown parsing error'
       loadingProgress.value = 0
@@ -81,6 +84,7 @@ export const useCsvStore = defineStore('csv', () => {
     loadingProgress,
     parseError,
     plainText,
+    loadId,
     hasData,
     isParsing,
     rowCount,
